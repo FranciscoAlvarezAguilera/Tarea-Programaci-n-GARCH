@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Francisco Alvarez Aguilera">
+
+<title>Tarea de programacion de modelo GARCH</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/clipboard/clipboard.min.js"></script>
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/quarto.js"></script>
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/popper.min.js"></script>
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/anchor.min.js"></script>
+<link href="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="TareaDeProgramacionDeModeloGARCH_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="TareaDeProgramacionDeModeloGARCH_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="TareaDeProgramacionDeModeloGARCH_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="TareaDeProgramacionDeModeloGARCH_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#tarea-de-programación-de-modelo-garch" id="toc-tarea-de-programación-de-modelo-garch" class="nav-link active" data-scroll-target="#tarea-de-programación-de-modelo-garch">TAREA DE PROGRAMACIÓN DE MODELO GARCH</a>
+  <ul>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link" data-scroll-target="#introducción">Introducción</a></li>
+  <li><a href="#desarrollo" id="toc-desarrollo" class="nav-link" data-scroll-target="#desarrollo">Desarrollo</a>
+  <ul class="collapse">
+  <li><a href="#volatilidad-convencional-o-fija-en-el-tiempo" id="toc-volatilidad-convencional-o-fija-en-el-tiempo" class="nav-link" data-scroll-target="#volatilidad-convencional-o-fija-en-el-tiempo">Volatilidad convencional o fija en el tiempo</a></li>
+  <li><a href="#volatilidad-con-suavizamiento-exponencial" id="toc-volatilidad-con-suavizamiento-exponencial" class="nav-link" data-scroll-target="#volatilidad-con-suavizamiento-exponencial">Volatilidad con suavizamiento exponencial</a></li>
+  <li><a href="#volatilidad-garch" id="toc-volatilidad-garch" class="nav-link" data-scroll-target="#volatilidad-garch">Volatilidad GARCH</a></li>
+  <li><a href="#el-conglomerado-de-volatilidades" id="toc-el-conglomerado-de-volatilidades" class="nav-link" data-scroll-target="#el-conglomerado-de-volatilidades">El conglomerado de volatilidades</a></li>
+  </ul></li>
+  <li><a href="#conclusión" id="toc-conclusión" class="nav-link" data-scroll-target="#conclusión">Conclusión</a></li>
+  </ul></li>
+  <li><a href="#análisis-cuantitativo" id="toc-análisis-cuantitativo" class="nav-link" data-scroll-target="#análisis-cuantitativo">ANÁLISIS CUANTITATIVO</a>
+  <ul>
+  <li><a href="#volatilidad-fija-en-el-tiempo-o-convencional." id="toc-volatilidad-fija-en-el-tiempo-o-convencional." class="nav-link" data-scroll-target="#volatilidad-fija-en-el-tiempo-o-convencional.">Volatilidad fija en el tiempo o convencional.</a></li>
+  <li><a href="#volatilidad-con-suavizamiento-exponencial-1" id="toc-volatilidad-con-suavizamiento-exponencial-1" class="nav-link" data-scroll-target="#volatilidad-con-suavizamiento-exponencial-1">Volatilidad con suavizamiento exponencial</a>
+  <ul class="collapse">
+  <li><a href="#con-suavizamiento-exponencial-y-parámetro-lambda-de-0.95" id="toc-con-suavizamiento-exponencial-y-parámetro-lambda-de-0.95" class="nav-link" data-scroll-target="#con-suavizamiento-exponencial-y-parámetro-lambda-de-0.95">Con suavizamiento exponencial y parámetro lambda de 0.95</a></li>
+  <li><a href="#con-suavizamiento-exponencial-y-parámetro-lambda-de-0.98" id="toc-con-suavizamiento-exponencial-y-parámetro-lambda-de-0.98" class="nav-link" data-scroll-target="#con-suavizamiento-exponencial-y-parámetro-lambda-de-0.98">Con suavizamiento exponencial y parámetro lambda de 0.98</a></li>
+  </ul></li>
+  <li><a href="#volatilidad-garch-1" id="toc-volatilidad-garch-1" class="nav-link" data-scroll-target="#volatilidad-garch-1">Volatilidad GARCH</a>
+  <ul class="collapse">
+  <li><a href="#garch-simétrico-con-función-de-verosimilitud-gaussiana." id="toc-garch-simétrico-con-función-de-verosimilitud-gaussiana." class="nav-link" data-scroll-target="#garch-simétrico-con-función-de-verosimilitud-gaussiana.">GARCH simétrico con función de verosimilitud gaussiana.</a></li>
+  <li><a href="#garch-simétrico-con-función-de-verosimilitud-t-student." id="toc-garch-simétrico-con-función-de-verosimilitud-t-student." class="nav-link" data-scroll-target="#garch-simétrico-con-función-de-verosimilitud-t-student.">GARCH simétrico con función de verosimilitud t-Student.</a></li>
+  <li><a href="#garch-simétrico-con-función-de-verosimilitud-ged." id="toc-garch-simétrico-con-función-de-verosimilitud-ged." class="nav-link" data-scroll-target="#garch-simétrico-con-función-de-verosimilitud-ged.">GARCH simétrico con función de verosimilitud GED.</a></li>
+  <li><a href="#gjr-garch-asimétrico-con-función-de-verosimilitud-gaussiana." id="toc-gjr-garch-asimétrico-con-función-de-verosimilitud-gaussiana." class="nav-link" data-scroll-target="#gjr-garch-asimétrico-con-función-de-verosimilitud-gaussiana.">GJR-GARCH (asimétrico) con función de verosimilitud gaussiana.</a></li>
+  <li><a href="#gjr-garch-asimétrico-con-función-de-verosimilitud-t-student." id="toc-gjr-garch-asimétrico-con-función-de-verosimilitud-t-student." class="nav-link" data-scroll-target="#gjr-garch-asimétrico-con-función-de-verosimilitud-t-student.">GJR-GARCH (asimétrico) con función de verosimilitud t-Student.</a></li>
+  <li><a href="#gjr-garch-asimétrico-con-función-de-verosimilitud-ged." id="toc-gjr-garch-asimétrico-con-función-de-verosimilitud-ged." class="nav-link" data-scroll-target="#gjr-garch-asimétrico-con-función-de-verosimilitud-ged.">GJR-GARCH (asimétrico) con función de verosimilitud GED.</a></li>
+  </ul></li>
+  <li><a href="#análisis-volatilidades" id="toc-análisis-volatilidades" class="nav-link" data-scroll-target="#análisis-volatilidades">Análisis volatilidades</a>
+  <ul class="collapse">
+  <li><a href="#criterio-de-información-de-akakike" id="toc-criterio-de-información-de-akakike" class="nav-link" data-scroll-target="#criterio-de-información-de-akakike">Criterio de información de Akakike</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="TareaDeProgramacionDeModeloGARCH.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tarea de programacion de modelo GARCH</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Francisco Alvarez Aguilera </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="tarea-de-programación-de-modelo-garch" class="level1">
+<h1>TAREA DE PROGRAMACIÓN DE MODELO GARCH</h1>
+<p>Hecho por:</p>
+<ul>
+<li>Francisco Alvarez Aguilera<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></li>
+</ul>
+<p><strong>Universidad Michoacana de San Nicolás de Hidalgo</strong></p>
+<p><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg-AEsvi0CFmM6Blq_wM67EJKaDQS7_KEf-4wd9U1J9jqs-oAGip3InqKyKBx0z76wGKFEAtRb9kiKBexyQCZSIE0PC7f-F00I5KqPXn1UL4t8RzDd3qcPsoIRYRi2pqRaIvjppNLAWdkI/s1600/Escudo+UMSNH.jpg" class="img-fluid" style="width:20.0%"></p>
+<p><strong>Licenciatura en Actuaría y Ciencia de Datos</strong></p>
+<p><img src="https://raw.githubusercontent.com/FranciscoAlvarezAguilera/E01-Markowitz/refs/heads/main/logo.png" class="img-fluid" style="width:30.0%"></p>
+<section id="introducción" class="level2">
+<h2 class="anchored" data-anchor-id="introducción">Introducción</h2>
+<p>La volatilidad es uno de los conceptos fundamentales para el análisis cuantitativo de series financieras como acciones, rendimientos, etcétera, pues representa una medida de la incertidumbre asociada a los rendimientos o variaciones de una variable aleatoria en el tiempo. Para nosotros como estudiantes de actuaría podría ser importante en ámbitos como la valuación de activos, la gestión integral de riesgos y las pruebas de solvencia dinámica, la estimación adecuada de la volatilidad es crucial para una medición realista del riesgo.</p>
+<p>A lo largo del tiempo se han desarrollado diversos métodos para estimar la volatilidad, los cuales difieren principalmente en los supuestos que realizan sobre su comportamiento temporal. Este ensayo presenta y discute tres enfoques ampliamente utilizados: la volatilidad convencional o constante, la volatilidad con suavizamiento exponencial y la volatilidad modelada mediante procesos GARCH. Se analizan sus propiedades teóricas y prácticas, poniendo especial énfasis en el fenómeno conocido como <em>conglomerado de volatilidades</em>.</p>
+</section>
+<section id="desarrollo" class="level2">
+<h2 class="anchored" data-anchor-id="desarrollo">Desarrollo</h2>
+<section id="volatilidad-convencional-o-fija-en-el-tiempo" class="level3">
+<h3 class="anchored" data-anchor-id="volatilidad-convencional-o-fija-en-el-tiempo">Volatilidad convencional o fija en el tiempo</h3>
+<p>La volatilidad convencional asume que la varianza de los rendimientos permanece constante a lo largo del tiempo. Bajo este supuesto, la volatilidad se estima mediante la desviación estándar muestral de los rendimientos ( r_t ), definida como:</p>
+<p><span class="math display">\[
+\sigma = \sqrt{\frac{1}{T-1}\sum_{t=1}^{T}(r_t - \bar{r})^2}
+\]</span></p>
+<p>donde ( <span class="math inline">\(\bar{r}\)</span> ) representa el rendimiento promedio y ( T ) el número total de observaciones.</p>
+<p>Desde una perspectiva teórica, este enfoque descansa en el supuesto de homocedasticidad, el cual rara vez se cumple en series financieras reales. En la práctica, su principal ventaja radica en su simplicidad y facilidad de interpretación, lo que lo hace útil como medida descriptiva o como punto de referencia inicial. Sin embargo, su limitación más importante es que ignora por completo la dinámica temporal del riesgo, lo que conduce a una subestimación del riesgo en periodos de alta volatilidad y a una sobrestimación en periodos de estabilidad.</p>
+</section>
+<section id="volatilidad-con-suavizamiento-exponencial" class="level3">
+<h3 class="anchored" data-anchor-id="volatilidad-con-suavizamiento-exponencial">Volatilidad con suavizamiento exponencial</h3>
+<p>La volatilidad con suavizamiento exponencial introduce dependencia temporal asignando mayor peso a las observaciones más recientes. Una formulación común de este enfoque es:</p>
+<p><span class="math display">\[
+\sigma_t^2 = \lambda \sigma_{t-1}^2 + (1 - \lambda) r_{t-1}^2
+\]</span></p>
+<p>donde ( 0 &lt; <span class="math inline">\(\lambda\)</span> &lt; 1 ) es el parámetro de suavizamiento que controla la velocidad de ajuste de la volatilidad.</p>
+<p>Teóricamente, este método reconoce que la información más reciente es más relevante para la estimación del riesgo actual. En términos prácticos, permite capturar cambios graduales en la volatilidad y responde con mayor rapidez a choques recientes que la volatilidad constante. No obstante, el valor del parámetro ( <span class="math inline">\(\lambda\)</span> ) suele fijarse de manera arbitraria y el modelo no define un proceso aleatorio completo para los rendimientos. Este tema de elegir el parámetro arbitrariamente es algo que corrige el siguiente modelo de volatilidad.</p>
+</section>
+<section id="volatilidad-garch" class="level3">
+<h3 class="anchored" data-anchor-id="volatilidad-garch">Volatilidad GARCH</h3>
+<p>Los modelos GARCH (Generalized Autoregressive Conditional Heteroskedasticity) proporcionan una formulación econométrica explícita para la volatilidad condicional. El modelo GARCH(1,1), ampliamente utilizado en la práctica, se define como:</p>
+<p><span class="math display">\[
+\sigma_t^2 = \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2
+\]</span></p>
+<p>con las restricciones ( <span class="math inline">\(\omega\)</span> &gt; 0 ), ( <span class="math inline">\(\alpha \geq\)</span> 0 ), ( <span class="math inline">\(\beta \geq\)</span> 0 ) y ( <span class="math inline">\(\alpha + \beta\)</span> &lt; 1 ).</p>
+<p>Desde el punto de vista teórico, este enfoque modela explícitamente la heterocedasticidad condicional y explica de forma natural el comportamiento dinámico de la volatilidad. En la práctica, los modelos GARCH permiten estimaciones más realistas del riesgo y son ampliamente utilizados en valuación de activos, gestión de riesgos y análisis regulatorio. Su principal desventaja es la mayor complejidad computacional y la necesidad de realizar estimaciones paramétricas, así como la sensibilidad a los supuestos sobre la distribución de los errores.</p>
+<p>Para ver mas acerca de los modelos de volatilidad anteriormente mencionados podemos revisar las notas utilizadas en clase y especificamente la presentación: “<strong>Medición de la volatilidad como insumo del VaR y el CVaR”</strong>{<a href="https://oscarvdelatorretorres.github.io/materias/01Actuaria/03admonRiesgos/02ModelosDeVolatilidad/#/title-slide" class="uri">https://oscarvdelatorretorres.github.io/materias/01Actuaria/03admonRiesgos/02ModelosDeVolatilidad/#/title-slide</a>}</p>
+</section>
+<section id="el-conglomerado-de-volatilidades" class="level3">
+<h3 class="anchored" data-anchor-id="el-conglomerado-de-volatilidades">El conglomerado de volatilidades</h3>
+<p>El <em>conglomerado de volatilidades</em> (<em>volatility clustering</em>) es un fenómeno empírico que describe la tendencia de los periodos de alta volatilidad a agruparse entre sí, al igual que los periodos de baja volatilidad. En otras palabras, grandes variaciones en los rendimientos tienden a ser seguidas por grandes variaciones, y pequeñas variaciones por pequeñas variaciones, independientemente del signo.</p>
+<p>Este comportamiento contradice el supuesto de varianza constante y justifica el uso de modelos dinámicos. Mientras que la volatilidad convencional ignora completamente este fenómeno, el suavizamiento exponencial lo captura de forma implícita, y los modelos GARCH lo incorporan de manera explícita y estructural dentro de su formulación.</p>
+</section>
+</section>
+<section id="conclusión" class="level2">
+<h2 class="anchored" data-anchor-id="conclusión">Conclusión</h2>
+<p>La estimación de la volatilidad es un componente esencial en el análisis cuantitativo del riesgo. La volatilidad convencional, aunque simple y fácil de implementar, resulta inadecuada en contextos donde la variabilidad del riesgo cambia en el tiempo. La volatilidad con suavizamiento exponencial representa un modelo intuitivo al introducir memoria temporal (con el <span class="math inline">\(\lambda\)</span> arbitrario), aunque carece de una estructura probabilística formal. Por su parte, los modelos GARCH ofrecen una representación más completa y realista de la dinámica de la volatilidad, capturando explícitamente el fenómeno de conglomerados de volatilidad.</p>
+<p>En aplicaciones prácticas donde la medición precisa del riesgo es crítica, como en la gestión financiera y actuarial, los modelos dinámicos de volatilidad constituyen herramientas indispensables. La elección del modelo adecuado debe balancear simplicidad, interpretabilidad y realismo, considerando siempre el objetivo específico del análisis.</p>
+</section>
+</section>
+<section id="análisis-cuantitativo" class="level1">
+<h1>ANÁLISIS CUANTITATIVO</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Liberías de yahoo finance de Github:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/OscarVDelatorreTorres/yahooFinance/main/datosMultiplesYahooFinance.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: tidyverse</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'forcats' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.1     ✔ stringr   1.5.2
+✔ ggplot2   4.0.0     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.1.0     </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+Cargando paquete requerido: zoo
+
+
+Adjuntando el paquete: 'zoo'
+
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Cargando paquete requerido: reticulate
+
+Cargando paquete requerido: tidyquant
+
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+
+── Attaching core tidyquant packages ─────────────────────── tidyquant 1.0.11 ──
+✔ PerformanceAnalytics 2.0.8      ✔ TTR                  0.24.4
+✔ quantmod             0.4.28     ✔ xts                  0.14.1
+── Conflicts ────────────────────────────────────────── tidyquant_conflicts() ──
+✖ zoo::as.Date()                 masks base::as.Date()
+✖ zoo::as.Date.numeric()         masks base::as.Date.numeric()
+✖ dplyr::filter()                masks stats::filter()
+✖ xts::first()                   masks dplyr::first()
+✖ dplyr::lag()                   masks stats::lag()
+✖ xts::last()                    masks dplyr::last()
+✖ PerformanceAnalytics::legend() masks graphics::legend()
+✖ quantmod::summary()            masks base::summary()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+Cargando paquete requerido: imputeTS
+
+
+Adjuntando el paquete: 'imputeTS'
+
+
+The following object is masked from 'package:zoo':
+
+    na.locf</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "All the quantitative finance functions loaded..."</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Librerías de cuantificación de riesgos en Github:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/OscarVDelatorreTorres/riskManagementSuiteR/refs/heads/main/riskManagementSuiteFunctions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: Rdpack</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'Rdpack' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'rugarch' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: parallel
+
+Adjuntando el paquete: 'rugarch'
+
+The following object is masked from 'package:purrr':
+
+    reduce
+
+Cargando paquete requerido: fGarch</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'fGarch' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>NOTE: Packages 'fBasics', 'timeDate', and 'timeSeries' are no longer
+attached to the search() path when 'fGarch' is attached.
+
+If needed attach them yourself in your R script by e.g.,
+        require("timeSeries")
+
+Adjuntando el paquete: 'fGarch'
+
+The following objects are masked from 'package:PerformanceAnalytics':
+
+    ES, VaR
+
+The following object is masked from 'package:TTR':
+
+    volatility
+
+Cargando paquete requerido: doParallel</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'doParallel' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: foreach</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'foreach' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'foreach'
+
+The following objects are masked from 'package:purrr':
+
+    accumulate, when
+
+Cargando paquete requerido: iterators</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'iterators' was built under R version 4.5.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Librerías de uso general:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'plotly'
+
+The following object is masked from 'package:ggplot2':
+
+    last_plot
+
+The following object is masked from 'package:stats':
+
+    filter
+
+The following object is masked from 'package:graphics':
+
+    layout</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tseries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'tseries'
+
+The following object is masked from 'package:imputeTS':
+
+    na.remove</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quantmod)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'DT' was built under R version 4.5.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rugarch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Comenzamos: “La serie de tiempo debe ser de periodicidad diaria del 20 de noviembre de 2023 al 20 de noviembre de 2024 para este análisis puntual al 20 de noviembre de 2024.”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identificador:</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>tickerV<span class="ot">=</span><span class="fu">c</span>(<span class="st">"QQQ"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Fecha desde empleando la fecha actual menos 500 días:</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>deD<span class="ot">=</span><span class="st">"2023-11-20"</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fecha hasta, empleando la fecha actual en el sistema:</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>hastaD<span class="ot">=</span><span class="st">"2024-11-20"</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Definiendo la periodicidad de los datos:</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>per<span class="ot">=</span><span class="st">"D"</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>paridadFX<span class="ot">=</span><span class="st">"USDMXN=X"</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>convertirFX<span class="ot">=</span><span class="fu">c</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>Datos<span class="ot">=</span><span class="fu">historico_multiples_precios</span>(<span class="at">tickers=</span>tickerV,<span class="at">de=</span>deD,<span class="at">hasta=</span>hastaD,<span class="at">periodicidad=</span>per,<span class="at">fxRate=</span>paridadFX,<span class="at">whichToFX=</span>convertirFX)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Extrayendo RIC 1 de 1 (QQQ), periodicidad D"
+[1] "Extrayendo QQQ..."
+[1] "Convirtiendo QQQ con paridad cambiaria USDMXN=X..."
+[1] "QQQ extraído de Yahoo Finance..."
+[1] "Se terminó de extraer y procesar un total de 1 tickers desde las BD de Yahoo Finance..."
+[1] "Tickers procesados: QQQ"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>precios<span class="ot">=</span>Datos<span class="sc">$</span>tablaPrecios</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>rendimientos<span class="ot">=</span>Datos<span class="sc">$</span>tablaRendimientosCont</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>“Posteriormente debe hacer un análisis cuantitativo del mejor ajuste de los 3 tipos de volatilidad con los rendimientos continuamente compuestos de una inversión de $500,000.00 en el fondo QQQ (valuado en pesos mexicanos).</p>
+<p>Para probar el beneficio, para ese caso particular de ese fondo, debe calcular las siguientes volatilidades:</p>
+<ol type="1">
+<li><p>Fija en el tiempo o convencional.</p></li>
+<li><p>Con suavizamiento exponencial y parámetro lambda de 0.95</p></li>
+<li><p>Con suavizamiento exponencial y parámetro lambda de 0.98</p></li>
+<li><p>GARCH simétrico con función de verosimilitud gaussiana.</p></li>
+<li><p>GARCH simétrico con función de verosimilitud t-Student.</p></li>
+<li><p>GARCH simétrico con función de verosimilitud GED.</p></li>
+<li><p>GJR-GARCH (asimétrico) con función de verosimilitud gaussiana.</p></li>
+<li><p>GJR-GARCH (asimétrico) con función de verosimilitud t-Student.</p></li>
+<li><p>GJR-GARCH (asimétrico) con función de verosimilitud GED.</p></li>
+</ol>
+<p>Determine, empleando el criterio de información de Akaike (función AIC), cuál es el que mejor ajusta a los largo de toda la serie de tiempo.”</p>
+<section id="volatilidad-fija-en-el-tiempo-o-convencional." class="level2">
+<h2 class="anchored" data-anchor-id="volatilidad-fija-en-el-tiempo-o-convencional.">Volatilidad fija en el tiempo o convencional.</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>sigmas<span class="ot">=</span><span class="fu">sd</span>(rendimientos[,<span class="dv">2</span>])</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sigmas</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.263346</code></pre>
+</div>
+</div>
+</section>
+<section id="volatilidad-con-suavizamiento-exponencial-1" class="level2">
+<h2 class="anchored" data-anchor-id="volatilidad-con-suavizamiento-exponencial-1">Volatilidad con suavizamiento exponencial</h2>
+<section id="con-suavizamiento-exponencial-y-parámetro-lambda-de-0.95" class="level3">
+<h3 class="anchored" data-anchor-id="con-suavizamiento-exponencial-y-parámetro-lambda-de-0.95">Con suavizamiento exponencial y parámetro lambda de 0.95</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>lambda1 <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>pesos<span class="ot">=</span>lambda1<span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span> (<span class="fu">nrow</span>(rendimientos)<span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>varExp1<span class="ot">=</span>(<span class="dv">1</span><span class="sc">-</span>lambda1)<span class="sc">*</span><span class="fu">sum</span>(pesos<span class="sc">*</span>(rendimientos[,<span class="dv">2</span>]<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>volExp1 <span class="ot">=</span> <span class="fu">sqrt</span>(varExp1)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>volExp1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.003884</code></pre>
+</div>
+</div>
+</section>
+<section id="con-suavizamiento-exponencial-y-parámetro-lambda-de-0.98" class="level3">
+<h3 class="anchored" data-anchor-id="con-suavizamiento-exponencial-y-parámetro-lambda-de-0.98">Con suavizamiento exponencial y parámetro lambda de 0.98</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lambda2 <span class="ot">=</span> <span class="fl">0.98</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>pesos<span class="ot">=</span>lambda2<span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span> (<span class="fu">nrow</span>(rendimientos)<span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>varExp2<span class="ot">=</span>(<span class="dv">1</span><span class="sc">-</span>lambda2)<span class="sc">*</span><span class="fu">sum</span>(pesos<span class="sc">*</span>(rendimientos[,<span class="dv">2</span>]<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>volExp2 <span class="ot">=</span> <span class="fu">sqrt</span>(varExp2)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>volExp2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.074581</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="volatilidad-garch-1" class="level2">
+<h2 class="anchored" data-anchor-id="volatilidad-garch-1">Volatilidad GARCH</h2>
+<section id="garch-simétrico-con-función-de-verosimilitud-gaussiana." class="level3">
+<h3 class="anchored" data-anchor-id="garch-simétrico-con-función-de-verosimilitud-gaussiana.">GARCH simétrico con función de verosimilitud gaussiana.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. GARCH(1,1) / Gaussiana (Norm)</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>spec_garch_norm <span class="ot">=</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'sGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'norm'</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>fit_garch_norm <span class="ot">=</span> <span class="fu">ugarchfit</span>(spec_garch_norm, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="garch-simétrico-con-función-de-verosimilitud-t-student." class="level3">
+<h3 class="anchored" data-anchor-id="garch-simétrico-con-función-de-verosimilitud-t-student.">GARCH simétrico con función de verosimilitud t-Student.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. GARCH(1,1) / t-Student (Std)</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>spec_garch_std <span class="ot">&lt;-</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'sGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'std'</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>fit_garch_std  <span class="ot">&lt;-</span> <span class="fu">ugarchfit</span>(spec_garch_std, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="garch-simétrico-con-función-de-verosimilitud-ged." class="level3">
+<h3 class="anchored" data-anchor-id="garch-simétrico-con-función-de-verosimilitud-ged.">GARCH simétrico con función de verosimilitud GED.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. GARCH(1,1) / GED</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>spec_garch_ged <span class="ot">&lt;-</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'sGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'ged'</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>fit_garch_ged  <span class="ot">&lt;-</span> <span class="fu">ugarchfit</span>(spec_garch_ged, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gjr-garch-asimétrico-con-función-de-verosimilitud-gaussiana." class="level3">
+<h3 class="anchored" data-anchor-id="gjr-garch-asimétrico-con-función-de-verosimilitud-gaussiana.">GJR-GARCH (asimétrico) con función de verosimilitud gaussiana.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. GJR-GARCH(1,1) / Gaussiana (Norm)</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>spec_gjr_norm <span class="ot">&lt;-</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'gjrGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'norm'</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>fit_gjr_norm   <span class="ot">&lt;-</span> <span class="fu">ugarchfit</span>(spec_gjr_norm, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gjr-garch-asimétrico-con-función-de-verosimilitud-t-student." class="level3">
+<h3 class="anchored" data-anchor-id="gjr-garch-asimétrico-con-función-de-verosimilitud-t-student.">GJR-GARCH (asimétrico) con función de verosimilitud t-Student.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. GJR-GARCH(1,1) / t-Student (Std)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>spec_gjr_std <span class="ot">&lt;-</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'gjrGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'std'</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>fit_gjr_std    <span class="ot">&lt;-</span> <span class="fu">ugarchfit</span>(spec_gjr_std, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gjr-garch-asimétrico-con-función-de-verosimilitud-ged." class="level3">
+<h3 class="anchored" data-anchor-id="gjr-garch-asimétrico-con-función-de-verosimilitud-ged.">GJR-GARCH (asimétrico) con función de verosimilitud GED.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. GJR-GARCH(1,1) / GED</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>spec_gjr_ged <span class="ot">&lt;-</span> <span class="fu">ugarchspec</span>(</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variance.model =</span> <span class="fu">list</span>(<span class="at">model =</span> <span class="st">'gjrGARCH'</span>, <span class="at">garchOrder =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution.model =</span> <span class="st">'ged'</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>fit_gjr_ged    <span class="ot">&lt;-</span> <span class="fu">ugarchfit</span>(spec_gjr_ged, <span class="at">data =</span> rendimientos[,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="análisis-volatilidades" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-volatilidades">Análisis volatilidades</h2>
+<p>Primero debemos comparar todos los resultados obtenidos para los distintos tipos de volatilidad. Creamos una tabla que comprenda a todas estas para después graficar, para esto debemos aplicar las funciones rollGARCH( ) y rollEWSigma( ) a los casos pertinentes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>suavExponMovil95<span class="ot">=</span><span class="fu">rollEWSigma</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">lambda=</span><span class="fl">0.95</span>,<span class="at">ventana=</span><span class="dv">100</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>suavExponMovil98<span class="ot">=</span><span class="fu">rollEWSigma</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">lambda=</span><span class="fl">0.98</span>,<span class="at">ventana=</span><span class="dv">100</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>garchMovil1<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"sGARCH"</span>,<span class="at">LLF=</span><span class="st">"norm"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>garchMovil2<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"sGARCH"</span>,<span class="at">LLF=</span><span class="st">"std"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>garchMovil3<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"sGARCH"</span>,<span class="at">LLF=</span><span class="st">"ged"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>garchMovil4<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"gjrGARCH"</span>,<span class="at">LLF=</span><span class="st">"norm"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>garchMovil5<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"gjrGARCH"</span>,<span class="at">LLF=</span><span class="st">"std"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>garchMovil6<span class="ot">=</span><span class="fu">rollGARCH</span>(rendimientos<span class="sc">$</span>QQQ,<span class="at">model=</span><span class="st">"gjrGARCH"</span>,<span class="at">LLF=</span><span class="st">"ged"</span>,<span class="at">garchOrder=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">ventana=</span><span class="dv">100</span>,<span class="at">arma=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">include.mean =</span> <span class="cn">FALSE</span>,<span class="at">upDown=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Recopilamos en una tabla:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>tablaVolatilidades<span class="ot">=</span><span class="fu">data.frame</span>(<span class="at">Fecha=</span>rendimientos<span class="sc">$</span>Date,</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_SE_95=</span>suavExponMovil95,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_SE_98=</span>suavExponMovil98,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_sGARCH_norm=</span>garchMovil1,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_sGARCH_std=</span>garchMovil2,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_sGARCH_ged=</span>garchMovil3,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_gjrGARCH_norm=</span>garchMovil4,</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_gjrGARCH_std=</span>garchMovil5,</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">Volatilidad_gjrGARCH_ged=</span>garchMovil6</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>           ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Graficamos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definición del objeto de gráfico inicial</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>grafico_volatilidades_addtrace <span class="ot">&lt;-</span> <span class="fu">plot_ly</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layout</span>(</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Comparación de Volatilidades (Suavizado vs. GARCH/GJR)"</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">xaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Fecha"</span>),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">yaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Desviación Estándar Condicional"</span>),</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend =</span> <span class="fu">list</span>(<span class="at">orientation =</span> <span class="st">'h'</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="sc">-</span><span class="fl">0.15</span>)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos las 9 trazas de volatilidad por partes con add_trace()</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Volatilidades por Suavizado Exponencial (SE) ---</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>grafico_volatilidades_addtrace <span class="ot">&lt;-</span> grafico_volatilidades_addtrace <span class="sc">%&gt;%</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_SE_95,</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"SE (λ=0.95)"</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_SE_98,</span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"SE (λ=0.98)"</span></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Volatilidades GARCH Simétrico (sGARCH) ---</span></span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>grafico_volatilidades_addtrace <span class="ot">&lt;-</span> grafico_volatilidades_addtrace <span class="sc">%&gt;%</span></span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_sGARCH_norm,</span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"sGARCH (Gaussiana)"</span></span>
+<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_sGARCH_std,</span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"sGARCH (t-Student)"</span></span>
+<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_sGARCH_ged,</span>
+<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"sGARCH (GED)"</span></span>
+<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Volatilidades GJR-GARCH Asimétrico ---</span></span>
+<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a>grafico_volatilidades_addtrace <span class="ot">&lt;-</span> grafico_volatilidades_addtrace <span class="sc">%&gt;%</span></span>
+<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-62"><a href="#cb43-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-63"><a href="#cb43-63" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_gjrGARCH_norm,</span>
+<span id="cb43-64"><a href="#cb43-64" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-65"><a href="#cb43-65" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-66"><a href="#cb43-66" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"GJR-GARCH (Gaussiana)"</span></span>
+<span id="cb43-67"><a href="#cb43-67" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-68"><a href="#cb43-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-69"><a href="#cb43-69" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-70"><a href="#cb43-70" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-71"><a href="#cb43-71" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_gjrGARCH_std,</span>
+<span id="cb43-72"><a href="#cb43-72" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-73"><a href="#cb43-73" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-74"><a href="#cb43-74" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"GJR-GARCH (t-Student)"</span></span>
+<span id="cb43-75"><a href="#cb43-75" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-76"><a href="#cb43-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb43-77"><a href="#cb43-77" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVolatilidades,</span>
+<span id="cb43-78"><a href="#cb43-78" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb43-79"><a href="#cb43-79" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>Volatilidad_gjrGARCH_ged,</span>
+<span id="cb43-80"><a href="#cb43-80" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb43-81"><a href="#cb43-81" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb43-82"><a href="#cb43-82" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"GJR-GARCH (GED)"</span></span>
+<span id="cb43-83"><a href="#cb43-83" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-84"><a href="#cb43-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-85"><a href="#cb43-85" aria-hidden="true" tabindex="-1"></a>grafico_volatilidades_addtrace</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><img src="https://raw.githubusercontent.com/FranciscoAlvarezAguilera/Tarea-Programaci-n-GARCH/refs/heads/main/ssgarch2.png" class="img-fluid"></p>
+<p>Ahora se calcula el VaR con las volatilidaes de la gráfica anterior, empleando la funcion VaR:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">500000</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>VaR_SE_95    <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_SE_95<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"norm"</span>, <span class="at">VaRt=</span><span class="dv">1</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>VaR_SE_98    <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_SE_98<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"norm"</span>, <span class="at">VaRt =</span> <span class="dv">1</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>VaR_sGARCH_norm <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_sGARCH_norm<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"norm"</span>, <span class="at">VaRt=</span><span class="dv">1</span>)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="co"># VaR_sGARCH_std  = VaR(M=M, sigma=tablaVolatilidades$Volatilidad_sGARCH_std/100, confidence=0.95, pdfFunct="std", VaRt=1)</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>VaR_sGARCH_ged  <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_sGARCH_ged<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"ged"</span>, <span class="at">VaRt=</span><span class="dv">1</span>)</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>VaR_gjrGARCH_norm <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_gjrGARCH_norm<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"norm"</span>, <span class="at">VaRt=</span><span class="dv">1</span>)</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="co"># VaR_gjrGARCH_std  = VaR(M=M, sigma=tablaVolatilidades$Volatilidad_gjrGARCH_std/100, confidence=0.95, pdfFunct="std", VaRt=1)</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>VaR_gjrGARCH_ged  <span class="ot">=</span> <span class="fu">VaR</span>(<span class="at">M=</span>M, <span class="at">sigma=</span>tablaVolatilidades<span class="sc">$</span>Volatilidad_gjrGARCH_ged<span class="sc">/</span><span class="dv">100</span>, <span class="at">confidence=</span><span class="fl">0.95</span>, <span class="at">pdfFunct=</span><span class="st">"ged"</span>, <span class="at">VaRt=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>tablaVaR <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">Fecha =</span> rendimientos<span class="sc">$</span>Date,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Modelos Originales</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_SE_95 =</span> VaR_SE_95,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_SE_98 =</span> VaR_SE_98,</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Modelos sGARCH (Simétrico)</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_sGARCH_norm =</span> VaR_sGARCH_norm,</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#VaR_sGARCH_std = VaR_sGARCH_std,</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_sGARCH_ged =</span> VaR_sGARCH_ged,</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Modelos GJR-GARCH (Asimétrico)</span></span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_gjrGARCH_norm =</span> VaR_gjrGARCH_norm,</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#VaR_gjrGARCH_std = VaR_gjrGARCH_std,</span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">VaR_gjrGARCH_ged =</span> VaR_gjrGARCH_ged</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ahora graficamos el VaR en terminos monetarios y omitiendo los modelos distribuidos t-student, esto debido a problemas con la función VaR y la aplicación de la firma de esta al modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>grafico_VaR_comparacion <span class="ot">&lt;-</span> <span class="fu">plot_ly</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layout</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Comparación de Valor en Riesgo (VaR) al 95%"</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">xaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Fecha"</span>),</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">yaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Valor en Riesgo (VaR) Diario"</span>, <span class="at">tickformat =</span> <span class="st">"$,.0f"</span>), </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend =</span> <span class="fu">list</span>(<span class="at">orientation =</span> <span class="st">'h'</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="sc">-</span><span class="fl">0.15</span>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos las trazas correspondientes </span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- VaR por Suavizado Exponencial (SE) ---</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>grafico_VaR_comparacion <span class="ot">&lt;-</span> grafico_VaR_comparacion <span class="sc">%&gt;%</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_SE_95,</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR SE (λ=0.95)"</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_SE_98,</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR SE (λ=0.98)"</span></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a><span class="co"># --- VaR sGARCH (Simétrico) ---</span></span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>grafico_VaR_comparacion <span class="ot">&lt;-</span> grafico_VaR_comparacion <span class="sc">%&gt;%</span></span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_sGARCH_norm,</span>
+<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-38"><a href="#cb46-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR sGARCH (Gaussiana)"</span></span>
+<span id="cb46-39"><a href="#cb46-39" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb46-40"><a href="#cb46-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Se omite VaR_sGARCH_std</span></span>
+<span id="cb46-41"><a href="#cb46-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-42"><a href="#cb46-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-43"><a href="#cb46-43" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-44"><a href="#cb46-44" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_sGARCH_ged,</span>
+<span id="cb46-45"><a href="#cb46-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-46"><a href="#cb46-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-47"><a href="#cb46-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR sGARCH (GED)"</span></span>
+<span id="cb46-48"><a href="#cb46-48" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-49"><a href="#cb46-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-50"><a href="#cb46-50" aria-hidden="true" tabindex="-1"></a><span class="co"># --- VaR GJR-GARCH (Asimétrico) ---</span></span>
+<span id="cb46-51"><a href="#cb46-51" aria-hidden="true" tabindex="-1"></a>grafico_VaR_comparacion <span class="ot">&lt;-</span> grafico_VaR_comparacion <span class="sc">%&gt;%</span></span>
+<span id="cb46-52"><a href="#cb46-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-53"><a href="#cb46-53" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-54"><a href="#cb46-54" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-55"><a href="#cb46-55" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_gjrGARCH_norm,</span>
+<span id="cb46-56"><a href="#cb46-56" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-57"><a href="#cb46-57" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-58"><a href="#cb46-58" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR GJR-GARCH (Gaussiana)"</span></span>
+<span id="cb46-59"><a href="#cb46-59" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb46-60"><a href="#cb46-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Se omite VaR_gjrGARCH_std</span></span>
+<span id="cb46-61"><a href="#cb46-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_trace</span>(</span>
+<span id="cb46-62"><a href="#cb46-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> tablaVaR,</span>
+<span id="cb46-63"><a href="#cb46-63" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>Fecha,</span>
+<span id="cb46-64"><a href="#cb46-64" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>VaR_gjrGARCH_ged,</span>
+<span id="cb46-65"><a href="#cb46-65" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"scatter"</span>,</span>
+<span id="cb46-66"><a href="#cb46-66" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb46-67"><a href="#cb46-67" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"VaR GJR-GARCH (GED)"</span></span>
+<span id="cb46-68"><a href="#cb46-68" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-69"><a href="#cb46-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-70"><a href="#cb46-70" aria-hidden="true" tabindex="-1"></a>grafico_VaR_comparacion</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><img src="https://raw.githubusercontent.com/FranciscoAlvarezAguilera/Tarea-Programaci-n-GARCH/refs/heads/main/ssgarch3.png" class="img-fluid"></p>
+<section id="criterio-de-información-de-akakike" class="level3">
+<h3 class="anchored" data-anchor-id="criterio-de-información-de-akakike">Criterio de información de Akakike</h3>
+<p>Para determinar el modelo que mejor se ajusta a a lo largo de la serie de tiempo utilizaremos el criterio de información que se revisó durante el curso, este es el criterio de información de Akaike (función <span class="math inline">\(AIC\)</span>).</p>
+<p>Este criterio se basa en la idea de que un modelo que capta más información de la realidad estudiada es el que tiene la mayor verosimilitud.</p>
+<p>Su lógica de cálculo es la de penalizar la complejidad del modelo con el número de parámetros <span class="math inline">\(k\)</span> que tiene. Es decir, si un modelo tiene más parámetros, es más complejo y, por lo tanto, se penaliza con un valor mayor en el criterio de información.</p>
+<p>Contrario al empleo de la función <span class="math inline">\(LLF\)</span>, el modelo que más informacion capta (mejor se ajusta a la realidad modelada) es el que tiene el <strong>criterio de información más bajo</strong> de los <span class="math inline">\(M\)</span> modelos comparados.</p>
+<p><span class="math inline">\(AIC=−2⋅LLF+2⋅k\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>AIC.rugarch<span class="ot">=</span><span class="cf">function</span>(object){</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  k<span class="ot">=</span> <span class="fu">length</span>(object<span class="sc">@</span>fit<span class="sc">$</span>coef)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  llf<span class="ot">=</span>object<span class="sc">@</span>fit<span class="sc">$</span>LLH</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  aic<span class="ot">=</span>(<span class="dv">2</span><span class="sc">*</span>k)<span class="sc">-</span>(<span class="dv">2</span><span class="sc">*</span>llf)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(aic)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>AIC_comparativo <span class="ot">=</span> <span class="fu">c</span>( <span class="st">"GARCH norm"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_garch_norm),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"GARCH std"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_garch_std),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"GARCH ged"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_garch_ged),</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"GJR norm"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_gjr_norm),</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"GJR std"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_gjr_std),</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"GJR ged"</span> <span class="ot">=</span> <span class="fu">AIC.rugarch</span>(fit_gjr_ged)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>                     )</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"El criterio de infomación de Akaike para los modelos son:</span><span class="sc">\n\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>El criterio de infomación de Akaike para los modelos son:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>AIC_comparativo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>GARCH norm  GARCH std  GARCH ged   GJR norm    GJR std    GJR ged 
+  834.4884   833.0750   833.7628   831.8026   831.3876   831.7156 </code></pre>
+</div>
+</div>
+<p>En base a los resultados del criterio de Akaike obtenemos que el modelo que <strong>mejor</strong> se ajusta a la serie a lo largo del tiempo es el modelo <strong>GJR-GARCH (asimétrico) con función de verosimilitud t-Student</strong>.</p>
+</section>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>1911217e@umich.mx<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
